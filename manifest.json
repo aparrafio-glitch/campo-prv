@@ -1,0 +1,31 @@
+{
+  "name": "Campo PRV · Diagnóstico Infraestructura",
+  "short_name": "Campo PRV",
+  "description": "Diagnóstico de infraestructura aérea Municipalidad de Providencia",
+  "start_url": "./diagnostico_campo_PRV_v2.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A0F1E",
+  "theme_color": "#00D4C8",
+  "lang": "es-CL",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": [
+    "utilities",
+    "productivity"
+  ],
+  "screenshots": []
+}
