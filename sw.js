@@ -1,7 +1,7 @@
 // Campo PRV Service Worker — Cache offline
 var CACHE = 'campo-prv-v1';
 var ARCHIVOS = [
-  './diagnostico_campo_PRV_v2.html',
+  './index.html',
   './manifest.json'
 ];
 
@@ -30,7 +30,7 @@ self.addEventListener('fetch', function(e) {
   e.respondWith(
     caches.match(e.request).then(function(cached) {
       return cached || fetch(e.request).catch(function() {
-        return caches.match('./diagnostico_campo_PRV_v2.html');
+        return caches.match('./index.html');
       });
     })
   );

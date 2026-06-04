@@ -2,7 +2,7 @@
   "name": "Campo PRV · Diagnóstico Infraestructura",
   "short_name": "Campo PRV",
   "description": "Diagnóstico de infraestructura aérea Municipalidad de Providencia",
-  "start_url": "./diagnostico_campo_PRV_v2.html",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
