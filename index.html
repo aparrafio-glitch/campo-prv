@@ -24,6 +24,34 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--san
 #app{display:flex;flex-direction:column;height:100%;max-width:480px;margin:0 auto}
 .screen{flex:1;overflow-y:auto;padding:16px;padding-bottom:84px;display:none}
 .screen.active{display:block}
+
+
+/* EXPORT PROGRESS */
+.exp-prog-ov{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:600;
+  display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px}
+.exp-prog-ov.open{display:flex}
+.exp-prog-box{background:var(--bg2);border:1px solid var(--teal);border-radius:14px;
+  padding:28px 24px;width:100%;max-width:340px;text-align:center}
+.exp-prog-ico{font-size:36px;margin-bottom:12px}
+.exp-prog-title{font-size:15px;font-weight:700;margin-bottom:6px}
+.exp-prog-msg{font-size:12px;color:var(--tx2);margin-bottom:16px;min-height:32px;line-height:1.5}
+.exp-prog-bar{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.exp-prog-fill{height:6px;background:var(--teal);border-radius:3px;
+  width:0%;transition:width .3s ease}
+.exp-prog-pct{font-family:var(--mono);font-size:12px;color:var(--teal);margin-top:8px}
+
+/* MUNICIPALITY SETUP */
+.muni-overlay{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:500;
+  display:flex;align-items:center;justify-content:center;padding:20px}
+.muni-box{background:var(--bg2);border:2px solid var(--teal);border-radius:16px;
+  padding:28px;width:100%;max-width:420px}
+.muni-logo{font-size:40px;text-align:center;margin-bottom:12px}
+.muni-title{font-size:18px;font-weight:700;text-align:center;margin-bottom:6px}
+.muni-sub{font-size:12px;color:var(--tx2);text-align:center;margin-bottom:22px;line-height:1.5}
+.muni-badge{display:inline-block;font-family:var(--mono);font-size:11px;
+  background:rgba(0,212,200,.12);border:1px solid rgba(0,212,200,.3);
+  color:var(--teal);padding:3px 10px;border-radius:4px;margin-bottom:14px}
+
 /* NAV */
 .nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;
   background:var(--bg2);border-top:1px solid var(--bg4);display:flex;z-index:100}
@@ -195,6 +223,20 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--san
 .ctr-btn{width:40px;height:40px;border-radius:8px;border:1px solid var(--bg4);
   background:var(--bg3);color:var(--tx);font-size:22px;cursor:pointer;
   display:flex;align-items:center;justify-content:center}
+
+/* CABLE TYPES */
+.ctype-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--bg4)}
+.ctype-row:last-child{border-bottom:none}
+.ctype-chk{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--bg5);
+  background:var(--bg4);display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:10px;font-weight:700;color:transparent;cursor:pointer;transition:all .15s}
+.ctype-chk.on{background:var(--amber);border-color:var(--amber);color:var(--bg)}
+.ctype-nom{font-size:12px;flex:1;font-weight:500}
+.ctype-emps{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;padding-left:26px}
+.cte{padding:3px 8px;border-radius:4px;border:1px solid var(--bg5);background:var(--bg4);
+  font-size:11px;font-family:var(--mono);cursor:pointer;color:var(--tx2);transition:all .15s}
+.cte.on{background:rgba(245,158,11,.15);border-color:var(--amber);color:var(--amber)}
+
 /* SWITCH */
 .sw-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0}
 .sw-row label:first-child{font-size:13px}
@@ -338,9 +380,12 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--san
     <span class="hdr-b" id="hdr-cnt">0 reg.</span>
   </div>
   <div class="home-hero">
-    <h1>Diagnostico Campo</h1>
-    <p>Infraestructura aerea Providencia<br>Ley N.21.172 Chao Cables</p>
+    <h1>&#127961; Diagnostico Campo</h1>
+    <p id="home-muni-name">Municipalidad</p>
+    <p id="home-muni-region" style="font-size:11px;margin-top:3px">Diagnostico infraestructura aerea</p>
   </div>
+  <button class="btn btn-s" style="margin-bottom:13px;font-size:11px;padding:8px"
+    onclick="changeMuni()">&#9881; Cambiar municipalidad</button>
   <div class="stat-grid">
     <div class="stat-c"><div class="n tag-teal" id="st-tot">0</div><div class="l">Registros totales</div></div>
     <div class="stat-c"><div class="n tag-red"  id="st-an">0</div><div class="l">Con anomalias</div></div>
@@ -441,9 +486,9 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--san
       <option>GTD</option><option>Claro</option><option>Municipal</option><option>Desconocido</option></select></div></div>
     <div class="fld"><label>Estado estructural</label>
       <div class="state-row" id="state-row">
-        <div class="sbtn" data-v="normal"  onclick="selState('normal')"><span class="si">ok</span>Normal</div>
-        <div class="sbtn" data-v="danado"  onclick="selState('danado')"><span class="si">!</span>Danado</div>
-        <div class="sbtn" data-v="grave"   onclick="selState('grave')"><span class="si">!!</span>Grave</div>
+        <div class="sbtn" data-v="normal"  onclick="selState('normal')"><span class="si">&#9989;</span>Normal</div>
+        <div class="sbtn" data-v="danado"  onclick="selState('danado')"><span class="si">&#9888;&#65039;</span>Danado</div>
+        <div class="sbtn" data-v="grave"   onclick="selState('grave')"><span class="si">&#128721;</span>Grave</div>
       </div>
     </div>
     <div class="fld" id="fld-est-desc" style="display:none"><label>Descripcion del dano</label>
@@ -466,11 +511,10 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--san
   <div class="card">
     <div class="sec-title">Evaluacion</div>
     <div class="fld"><label>Prioridad de intervencion</label>
-      <div class="prio-row" id="prio-row">
-        <div class="pbtn" data-v="1" onclick="selPrio(1)"><span class="pi">R</span>P1<br>Urgente</div>
-        <div class="pbtn" data-v="2" onclick="selPrio(2)"><span class="pi">O</span>P2<br>Alta</div>
-        <div class="pbtn" data-v="3" onclick="selPrio(3)"><span class="pi">Y</span>P3<br>Media</div>
-        <div class="pbtn" data-v="4" onclick="selPrio(4)"><span class="pi">G</span>P4<br>Baja</div>
+      <div class="prio-row" id="prio-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="pbtn" data-v="1" onclick="selPrio(1)"><span class="pi">&#128308;</span>Alta</div>
+        <div class="pbtn" data-v="2" onclick="selPrio(2)"><span class="pi">&#128992;</span>Media</div>
+        <div class="pbtn" data-v="3" onclick="selPrio(3)"><span class="pi">&#128994;</span>Baja</div>
       </div>
     </div>
     <div class="fld" style="margin-top:11px">
@@ -523,17 +567,27 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--san
     <div><div class="exp-n" id="ex-fo">0</div><div class="exp-l">Fotos almacenadas</div></div></div>
   <div class="exp-c"><div class="exp-ico" style="background:rgba(239,68,68,.1)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
     <div><div class="exp-n tag-red" id="ex-an">0</div><div class="exp-l">Con anomalias</div></div></div>
-  <button class="btn btn-p" style="margin-bottom:9px" onclick="expCSV()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-    Exportar CSV (Excel)
+  <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Con datos y fotos</div>
+  <button class="btn btn-p" style="margin-bottom:9px" onclick="expPDF()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    Informe PDF (con fotos)
   </button>
-  <button class="btn btn-s" style="margin-bottom:9px" onclick="expJSON()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-    Exportar JSON completo (con fotos)
+  <button class="btn btn-p" style="margin-bottom:9px;background:var(--green)" onclick="expExcel()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+    Planilla Excel (con fotos)
+  </button>
+  <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;margin-top:6px">Solo datos</div>
+  <button class="btn btn-s" style="margin-bottom:9px" onclick="expCSV()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+    Exportar CSV
   </button>
   <button class="btn btn-s" style="margin-bottom:9px" onclick="expGeo()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
     Exportar GeoJSON (QGIS/Mapa)
+  </button>
+  <button class="btn btn-s" style="margin-bottom:9px" onclick="expJSON()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    Exportar JSON (backup completo)
   </button>
   <div class="divider"></div>
   <button class="btn btn-d" onclick="clearAll()">
@@ -649,6 +703,39 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--san
 </nav>
 </div>
 
+<!-- EXPORT PROGRESS -->
+<div class="exp-prog-ov" id="exp-prog">
+  <div class="exp-prog-box">
+    <div class="exp-prog-ico" id="ep-ico">&#128196;</div>
+    <div class="exp-prog-title" id="ep-title">Generando archivo...</div>
+    <div class="exp-prog-msg"  id="ep-msg">Preparando datos</div>
+    <div class="exp-prog-bar"><div class="exp-prog-fill" id="ep-fill"></div></div>
+    <div class="exp-prog-pct" id="ep-pct">0%</div>
+  </div>
+</div>
+
+<!-- MUNICIPALITY SETUP -->
+<div class="muni-overlay" id="muni-setup">
+  <div class="muni-box">
+    <div class="muni-logo">&#127961;</div>
+    <div class="muni-title">Campo Diagnostico</div>
+    <div class="muni-sub">Infraestructura aerea · Ley N.21.172<br>Ingresa el nombre de la municipalidad para comenzar</div>
+    <div class="fld"><label>Nombre municipalidad</label>
+      <input type="text" id="muni-input" placeholder="Ej: Providencia, Santiago, Nunoa..."
+        style="font-size:16px" oninput="muniInputChange(this.value)">
+    </div>
+    <div class="fld" style="margin-top:10px"><label>Region (opcional)</label>
+      <input type="text" id="muni-region" placeholder="Ej: Region Metropolitana">
+    </div>
+    <button class="btn btn-p" style="margin-top:16px" id="muni-ok-btn"
+      onclick="saveMuni()" disabled>
+      Comenzar diagnostico
+    </button>
+    <p style="font-size:10px;color:var(--tx3);text-align:center;margin-top:10px;
+      font-family:var(--mono)">Esta configuracion se guarda en el dispositivo</p>
+  </div>
+</div>
+
 <!-- TAG SHEET -->
 <div class="overlay" id="tag-ov" onclick="if(event.target.id==='tag-ov')closeTag()">
   <div class="sheet" onclick="event.stopPropagation()">
@@ -680,6 +767,49 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--san
 
 <div class="toast" id="toast"></div>
 <script>
+// ═══ MUNICIPALITY CONFIG ═══
+var muniName = '';
+var muniRegion = '';
+
+function loadMuni(){
+  muniName   = localStorage.getItem('campo_muni_name') || '';
+  muniRegion = localStorage.getItem('campo_muni_region') || '';
+  if(muniName){
+    document.getElementById('muni-setup').style.display='none';
+    applyMuniToUI();
+  }
+  // Allow changing from home screen
+}
+function saveMuni(){
+  var name = document.getElementById('muni-input').value.trim();
+  var region = document.getElementById('muni-region').value.trim();
+  if(!name) return;
+  muniName = name; muniRegion = region;
+  localStorage.setItem('campo_muni_name', name);
+  localStorage.setItem('campo_muni_region', region);
+  document.getElementById('muni-setup').style.display='none';
+  applyMuniToUI();
+  toast('Municipalidad configurada: ' + name);
+}
+function muniInputChange(v){
+  document.getElementById('muni-ok-btn').disabled = v.trim().length === 0;
+}
+function applyMuniToUI(){
+  var hdr = document.getElementById('hdr-t');
+  if(hdr) hdr.textContent = muniName ? muniName.toUpperCase() : 'CAMPO PRV';
+  var hero = document.getElementById('home-muni-name');
+  if(hero) hero.textContent = 'Municipalidad de ' + muniName;
+  var heroReg = document.getElementById('home-muni-region');
+  if(heroReg) heroReg.textContent = muniRegion || 'Diagnostico infraestructura aerea';
+  document.title = 'Campo · ' + muniName;
+}
+function changeMuni(){
+  document.getElementById('muni-input').value = muniName;
+  document.getElementById('muni-region').value = muniRegion;
+  document.getElementById('muni-ok-btn').disabled = false;
+  document.getElementById('muni-setup').style.display='flex';
+}
+
 // ═══ CONSTANTS ═══
 var STREETS=['Av. Francisco Bilbao','Av. Eliodoro Yanez','Av. Salvador','Seminario',
 'Av. Condell','Av. General Bustamante','Av. Andres Bello','Av. Holanda',
@@ -690,19 +820,31 @@ var STREETS=['Av. Francisco Bilbao','Av. Eliodoro Yanez','Av. Salvador','Seminar
 'Santa Isabel','Emilio Vaisse','Ricardo Matte Perez','Girardi','Marin',
 'Fresia','Julio Prado','Tegualda'];
 
-var EMPRESAS=['Movistar','Entel','VTR','GTD','Claro','WOM','Telsur','Desconocida'];
+var EMPRESAS=['Movistar','Entel','VTR','GTD','Claro','WOM','MUNDO','Telsur','Desconocida'];
 
 var ANOMALIAS=[
-  {id:'baja_altura',   nom:'Baja altura / Sin tensar',  desc:'Cable bajo 4.5m o sin tension', col:'r', ico:'Bajo', hasH:true,  hasQ:true,  isBaja:true},
-  {id:'mufa_colgando', nom:'Mufa colgando',              desc:'Mufa de empalme suelta',         col:'r', ico:'Mufa', hasH:false, hasQ:true,  isBaja:false},
-  {id:'cable_cortado', nom:'Cable cortado / suelto',     desc:'Cable con corte o extremo libre',col:'r', ico:'Cort', hasH:false, hasQ:true,  isBaja:false},
-  {id:'acc_desuso',    nom:'Accesorios en desuso',       desc:'Herrajes o accesorios sin uso',  col:'a', ico:'Dsus', hasH:false, hasQ:true,  isBaja:false},
-  {id:'coaxial',       nom:'Cable coaxial colgante',     desc:'Tramo de coaxial suelto',        col:'a', ico:'Coax', hasH:false, hasQ:true,  isBaja:false},
-  {id:'abandonada',    nom:'Infraestructura abandonada', desc:'Cables o equipos fuera de servicio',col:'a',ico:'Abn',hasH:false,hasQ:true,isBaja:false},
-  {id:'exceso',        nom:'Exceso de cables',           desc:'Supera capacidad del poste',     col:'a', ico:'Exc', hasH:false, hasQ:false, isBaja:false},
-  {id:'sin_id',        nom:'Cable sin identificar',      desc:'Cable sin etiqueta de empresa',  col:'a', ico:'SID', hasH:false, hasQ:true,  isBaja:false},
-  {id:'riesgo_est',    nom:'Riesgo estructural',         desc:'Poste inclinado, fisurado',       col:'r', ico:'Est', hasH:false, hasQ:false, isBaja:false},
+  {id:'baja_altura',   nom:'Baja altura / Sin tensar',  desc:'Cable bajo 4.5m o sin tension reglamentaria', col:'r', ico:'📏', hasH:true,  hasQ:true,  isBaja:true,  hasTypes:false},
+  {id:'mufa_colgando', nom:'Mufa colgando',              desc:'Mufa de empalme sin soporte o suelta',         col:'r', ico:'🔌', hasH:false, hasQ:true,  isBaja:false, hasTypes:false},
+  {id:'cable_cortado', nom:'Cable cortado / suelto',     desc:'Cable con corte o extremo libre sin sujecion', col:'r', ico:'✂️',  hasH:false, hasQ:true,  isBaja:false, hasTypes:false},
+  {id:'acc_desuso',    nom:'Accesorios en desuso',       desc:'Herrajes, soportes o accesorios sin uso activo',col:'a',ico:'🗑️',hasH:false,hasQ:true, isBaja:false, hasTypes:false},
+  {id:'coaxial',       nom:'Cable coaxial colgante',     desc:'Tramo de cable coaxial suelto o enrollado',    col:'a', ico:'📡', hasH:false, hasQ:true,  isBaja:false, hasTypes:false},
+  {id:'exceso',        nom:'Exceso de cables',           desc:'Supera la capacidad autorizada del poste',     col:'a', ico:'⚡',   hasH:false, hasQ:false, isBaja:false, hasTypes:true},
+  {id:'sin_id',        nom:'Cable sin identificar',      desc:'Cable sin etiqueta o identificacion de empresa',col:'a',ico:'❓',  hasH:false, hasQ:true,  isBaja:false, hasTypes:false},
 ];
+
+
+var CABLE_TYPES=[
+  {id:'cobre_adsl',  nom:'Cobre (ADSL / STP)'},
+  {id:'coaxial_hfc', nom:'Coaxial (HFC)'},
+  {id:'paralelo',    nom:'Paralelo de cobre'},
+];
+// anomData for exceso includes cableTypes: {cobre_adsl:{empCounts:{}}, ...}
+function initExcesoTypes(anomId){
+  if(!anomData[anomId].cableTypes){
+    anomData[anomId].cableTypes={};
+    CABLE_TYPES.forEach(function(t){ anomData[anomId].cableTypes[t.id]={active:false,empCounts:{}}; });
+  }
+}
 
 var ACOLS={'baja_altura':'#EF4444','mufa_colgando':'#F59E0B','cable_cortado':'#EF4444',
   'acc_desuso':'#8B5CF6','coaxial':'#3B82F6','abandonada':'#94A3B8',
@@ -874,13 +1016,13 @@ function renderPosteState(){
 // ═══ PRIORITY ═══
 function selPrio(v){
   prio=v;
-  var cls=['','p1','p2','p3','p4'];
+  var cls=['','p1','p2','p3'];
   document.querySelectorAll('#prio-row .pbtn').forEach(function(b){
     var bv=parseInt(b.dataset.v);
     b.className='pbtn'+(bv===v?' '+cls[bv]:'');
   });
 }
-function renderPrio(){selPrio(3);}
+function renderPrio(){selPrio(2);}
 
 // ═══ CRUCETAS ═══
 function adjC(d){
@@ -968,6 +1110,36 @@ function renderAnomWrap(){
       var hb=document.createElement('span');hb.className='hbadge';hb.id='hb-'+a.id;
       hw.appendChild(hl);hw.appendChild(hi);hw.appendChild(hu);hw.appendChild(hb);
       det.appendChild(hw);
+    }
+    // cable types block (only for exceso de cables)
+    if(a.hasTypes){
+      initExcesoTypes(a.id);
+      var ctBlock=document.createElement('div');
+      var ctLbl=document.createElement('div');ctLbl.className='dlbl';ctLbl.style.marginTop='10px';
+      ctLbl.textContent='Tipo de cable con exceso + empresa responsable';
+      ctBlock.appendChild(ctLbl);
+      CABLE_TYPES.forEach(function(ct){
+        var ctRow=document.createElement('div');ctRow.className='ctype-row';
+        var chk=document.createElement('div');
+        chk.className='ctype-chk'+(anomData[a.id].cableTypes[ct.id].active?' on':'');
+        chk.textContent=anomData[a.id].cableTypes[ct.id].active?'v':'';
+        var nm=document.createElement('span');nm.className='ctype-nom';nm.textContent=ct.nom;
+        ctRow.appendChild(chk);ctRow.appendChild(nm);
+        // empresa grid for this cable type
+        var empWrap=document.createElement('div');empWrap.className='ctype-emps';
+        empWrap.id='cte-'+a.id+'-'+ct.id;
+        buildCtEmpGrid(a.id, ct.id, empWrap);
+        chk.addEventListener('click',function(ev){
+          ev.stopPropagation();
+          anomData[a.id].cableTypes[ct.id].active=!anomData[a.id].cableTypes[ct.id].active;
+          chk.className='ctype-chk'+(anomData[a.id].cableTypes[ct.id].active?' on':'');
+          chk.textContent=anomData[a.id].cableTypes[ct.id].active?'v':'';
+          empWrap.style.display=anomData[a.id].cableTypes[ct.id].active?'flex':'none';
+        });
+        empWrap.style.display=anomData[a.id].cableTypes[ct.id].active?'flex':'none';
+        ctBlock.appendChild(ctRow);ctBlock.appendChild(empWrap);
+      });
+      det.appendChild(ctBlock);
     }
     // comment toggle
     var cb=document.createElement('button');cb.className='cmt-btn'+(d.comentario?' open':'');
@@ -1058,6 +1230,25 @@ function updHBadge(id,val){
   else if(h<4.5){el.textContent='BAJO NORMA';el.className='hbadge hb-warn';}
   else{el.textContent='OK';el.className='hbadge hb-ok';}
 }
+function buildCtEmpGrid(anomId, ctId, container){
+  container.innerHTML='';
+  var ctData=anomData[anomId].cableTypes[ctId];
+  EMPRESAS.forEach(function(e){
+    var btn=document.createElement('div');
+    var sel=ctData.empCounts&&ctData.empCounts[e];
+    btn.className='cte'+(sel?' on':'');
+    btn.textContent=(sel?'v ':'')+e;
+    btn.addEventListener('click',function(ev){
+      ev.stopPropagation();
+      if(!ctData.empCounts)ctData.empCounts={};
+      if(ctData.empCounts[e])delete ctData.empCounts[e];
+      else ctData.empCounts[e]=true;
+      btn.className='cte'+(ctData.empCounts[e]?' on':'');
+      btn.textContent=(ctData.empCounts[e]?'v ':'')+e;
+    });
+    container.appendChild(btn);
+  });
+}
 function updSum(anomId){
   var el=document.getElementById('as-'+anomId);if(!el)return;
   var entries=Object.entries(anomData[anomId].empCounts||{});
@@ -1123,7 +1314,7 @@ function openTagSheet(idx){
     var isT=(ph.tags||[]).indexOf(a.id)>=0;
     var row=document.createElement('div');
     row.className='tag-row'+(isT?' on':'')+(isA?'':' dim');
-    var ico=document.createElement('span');ico.className='tag-ico';ico.textContent=a.ico;
+    var ico=document.createElement('span');ico.className='tag-ico';ico.innerHTML=a.ico;
     var nm=document.createElement('span');nm.className='tag-nm';nm.textContent=a.nom;
     var chk=document.createElement('div');chk.className='tag-chk';chk.textContent=isT?'v':'';
     row.appendChild(ico);row.appendChild(nm);row.appendChild(chk);
@@ -1173,7 +1364,16 @@ function saveRec(){
       activa.push(a.nom);
       var emps=Object.keys(d.empCounts||{});
       var tot=a.isBaja?(d.qty||0):Object.values(d.empCounts||{}).reduce(function(s,n){return s+n;},0);
-      detalle[a.id]={nombre:a.nom,empresas:emps,empresa_conteos:Object.assign({},d.empCounts),
+      var cableTypesOut={};
+      if(a.hasTypes&&d.cableTypes){
+        CABLE_TYPES.forEach(function(ct){
+          var ctd=d.cableTypes[ct.id];
+          if(ctd&&ctd.active){
+            cableTypesOut[ct.id]={nom:ct.nom,empresas:Object.keys(ctd.empCounts||{})};
+          }
+        });
+      }
+      detalle[a.id]={nombre:a.nom,empresas:emps,empresa_conteos:Object.assign({},d.empCounts),tipos_cable:cableTypesOut,
         cantidad_total:tot,cantidad:d.qty||0,altura:d.height||null,comentario:d.comentario||''};
     }
   });
@@ -1197,7 +1397,7 @@ function saveRec(){
     estado_poste:posteState||'normal',
     estado_desc:document.getElementById('f-est-desc').value.trim(),
     anomalias_activas:activa,anomalias_detalle:detalle,
-    empresas:Array.from(selEmps),prioridad:prio,
+    empresas:Array.from(selEmps),prioridad:prio||2,
     peatones:document.getElementById('sw-pe').checked,
     retiro:document.getElementById('sw-re').checked,
     notificado:document.getElementById('sw-no').checked,
@@ -1241,7 +1441,7 @@ function renderRecs(){
     rf.textContent=(r.ref?'#'+r.ref+' ':'')+(r.sector?'- '+r.sector+' ':'')+(r.tecnico?'- '+r.tecnico:'');
     tl.appendChild(st);tl.appendChild(rf);
     var bw=document.createElement('div');bw.className='rbdgs';
-    var b1=document.createElement('span');b1.className='rb';b1.style.color=pc[r.prioridad||3];b1.textContent='P'+(r.prioridad||3);bw.appendChild(b1);
+    var b1=document.createElement('span');b1.className='rb';b1.style.color=pc[r.prioridad||3];b1.textContent=['','Alta','Media','Baja'][r.prioridad||2]||'Media';bw.appendChild(b1);
     if(r.estado_poste==='grave'){var bx=document.createElement('span');bx.className='rb rb-r';bx.textContent='GRAVE';bw.appendChild(bx);}
     else if(r.estado_poste==='danado'){var bx=document.createElement('span');bx.className='rb rb-a';bx.textContent='DANADO';bw.appendChild(bx);}
     if(r.peatones){var bx=document.createElement('span');bx.className='rb rb-r';bx.textContent='PEAT';bw.appendChild(bx);}
@@ -1285,7 +1485,7 @@ function openDet(id){
     ['Estado',si[r.estado_poste]||'-'],['Propietario',r.propietario||'-'],
     ['GPS',r.lat?r.lat+', '+r.lon+(r.gps_acc?' +-'+r.gps_acc+'m':''):'Sin GPS'],
     ['Anomalias',anomStr],['Empresas',(r.empresas||[]).join(', ')||'-'],
-    ['Prioridad',['','P1-Urgente','P2-Alta','P3-Media','P4-Baja'][r.prioridad||3]],
+    ['Prioridad',['','Alta','Media','Baja'][r.prioridad||2]||'Media'],
     ['Peatones',r.peatones?'SI':'No'],['Retiro',r.retiro?'SI':'No'],
     ['Obs',r.obs||'-'],
   ];
@@ -1327,7 +1527,16 @@ function editRec(id){
     var det=(r.anomalias_detalle||{})[a.id]||{};
     var counts=Object.assign({},det.empresa_conteos||{});
     if(!Object.keys(counts).length)(det.empresas||[]).forEach(function(e){counts[e]=det.cantidad||1;});
-    anomData[a.id]={active:(r.anomalias_activas||[]).indexOf(a.nom)>=0,
+    var det2=(r.anomalias_detalle||{})[a.id]||{};
+    var ctRestored={};
+    if(a.hasTypes){
+      CABLE_TYPES.forEach(function(ct){
+        var ctSaved=(det2.tipos_cable||{})[ct.id]||{};
+        ctRestored[ct.id]={active:!!ctSaved.nom,empCounts:{}};
+        (ctSaved.empresas||[]).forEach(function(e){ctRestored[ct.id].empCounts[e]=true;});
+      });
+    }
+    anomData[a.id]={active:(r.anomalias_activas||[]).indexOf(a.nom)>=0,cableTypes:a.hasTypes?ctRestored:undefined,
       empCounts:counts,qty:det.cantidad||0,height:det.altura||'',comentario:det.comentario||''};
   });
   var sv=function(id2,v){var el=document.getElementById(id2);if(el)el.value=v||'';};
@@ -1355,6 +1564,424 @@ function editRec(id){
   closeDet();nav('form');
 }
 
+
+// ═══ PROGRESS HELPERS ═══
+function showProg(ico,title,msg){
+  document.getElementById('ep-ico').textContent=ico;
+  document.getElementById('ep-title').textContent=title;
+  document.getElementById('ep-msg').textContent=msg;
+  document.getElementById('ep-fill').style.width='0%';
+  document.getElementById('ep-pct').textContent='0%';
+  document.getElementById('exp-prog').classList.add('open');
+}
+function setProg(pct,msg){
+  document.getElementById('ep-fill').style.width=pct+'%';
+  document.getElementById('ep-pct').textContent=pct+'%';
+  if(msg) document.getElementById('ep-msg').textContent=msg;
+}
+function hideProg(){document.getElementById('exp-prog').classList.remove('open');}
+
+function loadScript(src){
+  return new Promise(function(resolve,reject){
+    if(document.querySelector('script[src="'+src+'"]')){resolve();return;}
+    var s=document.createElement('script');s.src=src;
+    s.onload=resolve;s.onerror=reject;document.head.appendChild(s);
+  });
+}
+
+// ═══ PDF EXPORT ═══
+async function expPDF(){
+  if(!recs.length){toast('Sin registros para exportar');return;}
+  showProg('\uD83D\uDCC4','Generando PDF','Cargando libreria...');
+  try{
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js');
+  }catch(e){hideProg();toast('Error cargando libreria PDF. Requiere internet.');return;}
+
+  setProg(5,'Iniciando documento...');
+  var jsPDF=window.jspdf.jsPDF;
+  var doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  var pageW=210, marginL=14, marginR=14, contentW=pageW-marginL-marginR;
+  var today=new Date().toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
+  var total=recs.length;
+
+  // ── COVER PAGE ──────────────────────────────────────────────────────────
+  // Header bar
+  doc.setFillColor(10,15,30);
+  doc.rect(0,0,210,297,'F');
+  doc.setFillColor(0,212,200);
+  doc.rect(0,0,210,4,'F');
+
+  // Logo circle
+  doc.setFillColor(0,212,200,0.15);
+  doc.setDrawColor(0,212,200);
+  doc.setLineWidth(0.5);
+  doc.circle(105,80,30,'D');
+  doc.setFontSize(28);
+  doc.setTextColor(0,212,200);
+  doc.text('\uD83D\uDCE1',105,85,{align:'center'});
+
+  // Title
+  doc.setFontSize(22);doc.setFont('helvetica','bold');
+  doc.setTextColor(241,245,249);
+  doc.text('INFORME DE DIAGNOSTICO',105,125,{align:'center'});
+  doc.setFontSize(14);doc.setFont('helvetica','normal');
+  doc.setTextColor(148,163,184);
+  doc.text('Infraestructura Aerea de Telecomunicaciones',105,135,{align:'center'});
+
+  // Municipality
+  doc.setFillColor(0,212,200,0.1);
+  doc.roundedRect(30,148,150,18,3,3,'F');
+  doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(0,212,200);
+  doc.text(muniName||'Municipalidad',105,159,{align:'center'});
+
+  // Stats grid on cover
+  var stats=[
+    {l:'Total registros',v:String(total)},
+    {l:'Con anomalias',  v:String(recs.filter(function(r){return(r.anomalias_activas||[]).length>0;}).length)},
+    {l:'Con fotos',      v:String(recs.filter(function(r){return r.n_fotos>0;}).length)},
+    {l:'Alta prioridad', v:String(recs.filter(function(r){return r.prioridad===1;}).length)},
+  ];
+  stats.forEach(function(s,i){
+    var col=i%2, row=Math.floor(i/2);
+    var x=marginL+col*95, y=185+row*30;
+    doc.setFillColor(28,35,51);
+    doc.roundedRect(x,y,88,24,3,3,'F');
+    doc.setFontSize(18);doc.setFont('helvetica','bold');doc.setTextColor(0,212,200);
+    doc.text(s.v,x+44,y+13,{align:'center'});
+    doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(148,163,184);
+    doc.text(s.l,x+44,y+20,{align:'center'});
+  });
+
+  doc.setFontSize(9);doc.setTextColor(71,85,105);
+  doc.text('Generado el '+today+' \u00b7 Ley N.21.172 Chao Cables',105,270,{align:'center'});
+  if(muniRegion){doc.text(muniRegion,105,276,{align:'center'});}
+  doc.setFillColor(0,212,200);doc.rect(0,293,210,4,'F');
+
+  setProg(10,'Portada lista — procesando registros...');
+
+  // ── RECORDS ─────────────────────────────────────────────────────────────
+  var PRIO_LABELS=['','Alta','Media','Baja'];
+  var PRIO_COLORS=[[239,68,68],[245,158,11],[16,185,129]];
+  var STATE_COLORS={normal:[16,185,129],danado:[245,158,11],grave:[239,68,68]};
+
+  for(var i=0;i<recs.length;i++){
+    var r=recs[i];
+    var ps=(photos[r.id]||[]).map(function(p){return typeof p==='string'?p:p.data;});
+    setProg(Math.round(10+i/total*80),'Procesando: '+r.calle+' #'+(r.ref||''));
+
+    doc.addPage();
+
+    // Record header bar
+    var pc=PRIO_COLORS[(r.prioridad||2)-1]||PRIO_COLORS[1];
+    doc.setFillColor(pc[0],pc[1],pc[2]);
+    doc.rect(0,0,210,1,'F');
+    doc.setFillColor(17,24,39);
+    doc.rect(0,1,210,18,'F');
+
+    // Street + ref
+    doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(241,245,249);
+    var streetText=r.calle+(r.ref?' #'+r.ref:'');
+    doc.text(streetText,marginL,12);
+    // Priority badge
+    var prioLbl=PRIO_LABELS[r.prioridad||2]||'Media';
+    doc.setFillColor(pc[0],pc[1],pc[2]);
+    doc.roundedRect(170,4,26,11,2,2,'F');
+    doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+    doc.text(prioLbl,183,11,{align:'center'});
+    // Record number
+    doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(71,85,105);
+    doc.text('Registro '+(i+1)+' de '+total,marginL,17);
+
+    var y=26;
+
+    // Main data table
+    var tableRows=[
+      ['Fecha',r.fecha_diag||'-','Tecnico',r.tecnico||'-'],
+      ['Sector',r.sector||'-','Vano/tramo',r.vano||'-'],
+      ['Calle',streetText,'Entre calles',r.entre||'-'],
+      ['Cables',r.cables?r.cables+' cables':'-','H.primera cruceta',r.h_primera?r.h_primera+'m':'-'],
+      ['H.ultima cruceta',r.h_ultima?r.h_ultima+'m':'-','Crucetas instal.',r.crucetas||0],
+      ['Tipo poste',r.tipo_poste||'-','Propietario',r.propietario||'-'],
+      ['Estado estructural',(r.estado_poste||'normal').toUpperCase(),'Accesibilidad',r.acceso||'-'],
+      ['GPS',r.lat?(r.lat+', '+r.lon):'-','Precision GPS',r.gps_acc?'+-'+r.gps_acc+'m':'-'],
+      ['Peatones en riesgo',r.peatones?'SI':'No','Retiro inmediato',r.retiro?'SI':'No'],
+      ['Prioridad',prioLbl,'Notificado',r.notificado?'Si':'No'],
+    ];
+
+    doc.autoTable({
+      startY:y,
+      head:[],
+      body:tableRows,
+      theme:'plain',
+      margin:{left:marginL,right:marginR},
+      styles:{fontSize:8,cellPadding:2,textColor:[148,163,184],fillColor:[17,24,39],lineColor:[36,48,71],lineWidth:0.2},
+      columnStyles:{
+        0:{fontStyle:'bold',textColor:[100,130,160],cellWidth:38},
+        1:{textColor:[241,245,249],cellWidth:55},
+        2:{fontStyle:'bold',textColor:[100,130,160],cellWidth:38},
+        3:{textColor:[241,245,249],cellWidth:55},
+      },
+      didParseCell:function(data){
+        if(data.row.index%2===0) data.cell.styles.fillColor=[17,24,39];
+        else data.cell.styles.fillColor=[28,35,51];
+        if(data.column.index===1&&data.row.index===6){
+          var st=r.estado_poste||'normal';
+          var sc=STATE_COLORS[st]||[148,163,184];
+          data.cell.styles.textColor=sc;
+          data.cell.styles.fontStyle='bold';
+        }
+      }
+    });
+
+    y=doc.lastAutoTable.finalY+5;
+
+    // Anomalies section
+    if((r.anomalias_activas||[]).length>0){
+      if(y>240){doc.addPage();y=20;}
+      doc.setFillColor(28,35,51);doc.rect(marginL,y,contentW,7,'F');
+      doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(0,212,200);
+      doc.text('ANOMALIAS DETECTADAS',marginL+2,y+5);
+      y+=9;
+      var anomRows=Object.values(r.anomalias_detalle||{}).map(function(d){
+        var emps=d.empresas&&d.empresas.length?d.empresas.join(', '):'-';
+        var qty=d.cantidad_total>0?String(d.cantidad_total):'-';
+        var alt=d.altura?d.altura+'m':'-';
+        var cmt=d.comentario||'-';
+        return [d.nombre,emps,qty,alt,cmt];
+      });
+      if(anomRows.length){
+        doc.autoTable({
+          startY:y,
+          head:[['Anomalia','Empresa(s)','Cant.','Altura','Comentario']],
+          body:anomRows,
+          theme:'plain',
+          margin:{left:marginL,right:marginR},
+          styles:{fontSize:7,cellPadding:2,textColor:[148,163,184],fillColor:[17,24,39],lineColor:[36,48,71],lineWidth:0.2},
+          headStyles:{fillColor:[36,48,71],textColor:[0,212,200],fontStyle:'bold'},
+          columnStyles:{0:{cellWidth:45},1:{cellWidth:40},2:{cellWidth:12},3:{cellWidth:14},4:{cellWidth:contentW-111}},
+        });
+        y=doc.lastAutoTable.finalY+5;
+      }
+    }
+
+    // Observations
+    if(r.obs){
+      if(y>250){doc.addPage();y=20;}
+      doc.setFillColor(28,35,51);doc.rect(marginL,y,contentW,7,'F');
+      doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(0,212,200);
+      doc.text('OBSERVACIONES',marginL+2,y+5);y+=10;
+      doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(241,245,249);
+      var obsLines=doc.splitTextToSize(r.obs,contentW);
+      doc.text(obsLines,marginL,y);
+      y+=obsLines.length*4+6;
+    }
+
+    // Photos
+    if(ps.length>0){
+      var photoRows=Math.ceil(ps.length/3);
+      var photoH=40, photoW=55, photoGap=5;
+      var neededH=photoRows*(photoH+photoGap)+20;
+      if(y+neededH>280){doc.addPage();y=20;}
+      doc.setFillColor(28,35,51);doc.rect(marginL,y,contentW,7,'F');
+      doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(0,212,200);
+      doc.text('REGISTRO FOTOGRAFICO ('+ps.length+' foto'+(ps.length>1?'s':'')+' )',marginL+2,y+5);
+      y+=10;
+      for(var pi=0;pi<ps.length;pi++){
+        var col2=pi%3, row2=Math.floor(pi/3);
+        var px=marginL+col2*(photoW+photoGap);
+        var py=y+row2*(photoH+photoGap);
+        if(py+photoH>285){doc.addPage();y=20;py=y+Math.floor(pi/3)*(photoH+photoGap);}
+        try{
+          var fmt=ps[pi].indexOf('data:image/png')>=0?'PNG':'JPEG';
+          doc.addImage(ps[pi],fmt,px,py,photoW,photoH);
+          doc.setDrawColor(36,48,71);doc.setLineWidth(0.3);
+          doc.rect(px,py,photoW,photoH,'S');
+          // Photo number
+          doc.setFillColor(0,0,0,0.6);doc.rect(px,py,14,6,'F');
+          doc.setFontSize(6);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+          doc.text('Foto '+(pi+1),px+7,py+4.5,{align:'center'});
+          // Tag anomalies on photo
+          var tagData=photos[r.id]&&photos[r.id][pi]&&photos[r.id][pi].tags;
+          if(tagData&&tagData.length){
+            var tagTxt=tagData.length+' anom.';
+            doc.setFillColor(0,212,200,0.85);
+            doc.rect(px,py+photoH-6,photoW,6,'F');
+            doc.setFontSize(6);doc.setFont('helvetica','bold');doc.setTextColor(10,15,30);
+            doc.text(tagTxt,px+photoW/2,py+photoH-2,{align:'center'});
+          }
+        }catch(e){
+          doc.setFillColor(36,48,71);doc.rect(px,py,photoW,photoH,'F');
+          doc.setFontSize(7);doc.setTextColor(71,85,105);
+          doc.text('Foto '+(pi+1),px+photoW/2,py+photoH/2,{align:'center'});
+        }
+      }
+    }
+
+    // Page footer
+    doc.setFontSize(7);doc.setTextColor(71,85,105);
+    doc.text(muniName||'Municipalidad',marginL,290);
+    doc.text('Pag '+(i+2),210-marginR,290,{align:'right'});
+    doc.setDrawColor(36,48,71);doc.setLineWidth(0.2);
+    doc.line(marginL,287,210-marginR,287);
+  }
+
+  setProg(95,'Guardando PDF...');
+  await new Promise(function(res){setTimeout(res,100);});
+  var fname='informe_diagnostico_'+(muniName||'campo').replace(/\s/g,'_').toLowerCase()+'_'+tdate()+'.pdf';
+  doc.save(fname);
+  setProg(100,'Listo');
+  actlog.unshift({ts:new Date().toISOString(),msg:'PDF exportado - '+total+' registros'});
+  saveData();
+  setTimeout(function(){hideProg();toast('PDF guardado: '+fname);},800);
+}
+
+// ═══ EXCEL EXPORT ═══
+async function expExcel(){
+  if(!recs.length){toast('Sin registros para exportar');return;}
+  showProg('\uD83D\uDCC5','Generando Excel','Cargando libreria...');
+  try{
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+  }catch(e){hideProg();toast('Error cargando libreria Excel. Requiere internet.');return;}
+
+  setProg(10,'Construyendo planilla...');
+  var XLSX=window.XLSX;
+  var wb=XLSX.utils.book_new();
+
+  // ── Sheet 1: Resumen ─────────────────────────────────────────────────
+  var resumen=[
+    [muniName?'Municipalidad de '+muniName:'Informe de Diagnostico'],
+    ['Infraestructura Aerea de Telecomunicaciones - Ley N.21.172'],
+    ['Fecha generacion: '+new Date().toLocaleDateString('es-CL')],
+    [],
+    ['ESTADISTICAS GENERALES'],
+    ['Total registros',recs.length],
+    ['Con anomalias',recs.filter(function(r){return(r.anomalias_activas||[]).length>0;}).length],
+    ['Con fotos',recs.filter(function(r){return r.n_fotos>0;}).length],
+    ['Prioridad Alta',recs.filter(function(r){return r.prioridad===1;}).length],
+    ['Prioridad Media',recs.filter(function(r){return r.prioridad===2;}).length],
+    ['Prioridad Baja',recs.filter(function(r){return r.prioridad===3;}).length],
+    ['Con GPS',recs.filter(function(r){return r.lat;}).length],
+    [],
+    ['ANOMALIAS MAS FRECUENTES'],
+  ];
+  var anomCount={};
+  recs.forEach(function(r){
+    (r.anomalias_activas||[]).forEach(function(a){anomCount[a]=(anomCount[a]||0)+1;});
+  });
+  Object.entries(anomCount).sort(function(a,b){return b[1]-a[1];}).forEach(function(e){
+    resumen.push([e[0],e[1]]);
+  });
+  var ws0=XLSX.utils.aoa_to_sheet(resumen);
+  ws0['!cols']=[{wch:45},{wch:15}];
+  XLSX.utils.book_append_sheet(wb,ws0,'Resumen');
+
+  // ── Sheet 2: Datos completos ─────────────────────────────────────────
+  setProg(30,'Hoja de datos...');
+  var PRIO=['','Alta','Media','Baja'];
+  var headers=['#','Municipalidad','Fecha','Tecnico','Sector','Calle','Referencia',
+    'Entre calles','Vano','Latitud','Longitud','Precision GPS (m)',
+    'Cables totales','H. primera cruceta (m)','H. ultima cruceta (m)',
+    'Altura poste (m)','Crucetas instaladas','Tipo poste','Propietario',
+    'Estado estructural','Descripcion dano','Anomalias detectadas',
+    'Empresas por anomalia','Cantidades','Empresas en el poste',
+    'Prioridad','Peatones en riesgo','Retiro inmediato','Notificado',
+    'Accesibilidad','N. fotos','Observaciones'];
+
+  var dataRows=[headers];
+  recs.forEach(function(r,idx){
+    var activa=(r.anomalias_activas||[]).join('; ');
+    var dets=Object.values(r.anomalias_detalle||{});
+    var empStr=dets.map(function(d){
+      return d.nombre+': '+Object.entries(d.empresa_conteos||{}).map(function(x){return x[0]+'('+x[1]+')';}).join(',');
+    }).join(' | ');
+    var qtyStr=dets.map(function(d){return d.nombre+':'+d.cantidad_total;}).join(' | ');
+    dataRows.push([
+      idx+1, muniName||'',
+      r.fecha_diag||'', r.tecnico||'', r.sector||'',
+      r.calle||'', r.ref||'', r.entre||'', r.vano||'',
+      r.lat||'', r.lon||'', r.gps_acc||'',
+      r.cables||'', r.h_primera||'', r.h_ultima||'',
+      r.altura_poste||'', r.crucetas||0,
+      r.tipo_poste||'', r.propietario||'',
+      r.estado_poste||'normal', r.estado_desc||'',
+      activa, empStr, qtyStr,
+      (r.empresas||[]).join(', '),
+      PRIO[r.prioridad||2]||'Media',
+      r.peatones?'Si':'No', r.retiro?'Si':'No', r.notificado?'Si':'No',
+      r.acceso||'', r.n_fotos||0, r.obs||''
+    ]);
+  });
+  var ws1=XLSX.utils.aoa_to_sheet(dataRows);
+  // Column widths
+  ws1['!cols']=[{wch:5},{wch:18},{wch:12},{wch:16},{wch:12},{wch:30},{wch:10},
+    {wch:20},{wch:10},{wch:12},{wch:12},{wch:14},{wch:14},{wch:20},{wch:20},
+    {wch:16},{wch:18},{wch:14},{wch:14},{wch:18},{wch:20},{wch:40},{wch:40},
+    {wch:20},{wch:25},{wch:10},{wch:14},{wch:16},{wch:12},{wch:16},{wch:8},{wch:40}];
+  // Freeze header row
+  ws1['!freeze']={xSplit:0,ySplit:1};
+  XLSX.utils.book_append_sheet(wb,ws1,'Datos');
+
+  // ── Sheet 3: Fotos (base64 links) ────────────────────────────────────
+  setProg(60,'Hoja de fotos...');
+  var fotoHeaders=['#','Municipalidad','Calle','Referencia','Fecha','N. foto',
+    'Anomalias etiquetadas','Foto (base64 — copiar en navegador)'];
+  var fotoRows=[fotoHeaders];
+  var fotoIdx=0;
+  recs.forEach(function(r,ri){
+    var ps=(photos[r.id]||[]);
+    ps.forEach(function(p,pi){
+      fotoIdx++;
+      var src=typeof p==='string'?p:p.data;
+      var tags=typeof p==='object'&&p.tags&&p.tags.length
+        ?p.tags.map(function(t){var a=ANOMALIAS.find(function(x){return x.id===t;});return a?a.nom:t;}).join('; ')
+        :'-';
+      fotoRows.push([
+        fotoIdx, muniName||'', r.calle||'', r.ref||'',
+        r.fecha_diag||'', 'Foto '+(pi+1), tags,
+        src.length>200?src.slice(0,200)+'...[truncado]':src
+      ]);
+    });
+  });
+  if(fotoRows.length>1){
+    var ws2=XLSX.utils.aoa_to_sheet(fotoRows);
+    ws2['!cols']=[{wch:5},{wch:18},{wch:30},{wch:12},{wch:12},{wch:10},{wch:40},{wch:50}];
+    XLSX.utils.book_append_sheet(wb,ws2,'Fotos');
+  }
+
+  // ── Sheet 4: Anomalias detalle ───────────────────────────────────────
+  setProg(80,'Hoja de anomalias...');
+  var anomHdr=['Municipalidad','Fecha','Calle','Referencia','Anomalia',
+    'Empresa responsable','Cantidad','Altura medida (m)','Comentario'];
+  var anomRows=[anomHdr];
+  recs.forEach(function(r){
+    Object.values(r.anomalias_detalle||{}).forEach(function(d){
+      var empresas=(d.empresas||[]).length?d.empresas:['Sin asignar'];
+      empresas.forEach(function(emp){
+        var qty=(d.empresa_conteos&&d.empresa_conteos[emp])||d.cantidad_total||'-';
+        anomRows.push([
+          muniName||'', r.fecha_diag||'', r.calle||'', r.ref||'',
+          d.nombre, emp, qty, d.altura||'-', d.comentario||'-'
+        ]);
+      });
+    });
+  });
+  if(anomRows.length>1){
+    var ws3=XLSX.utils.aoa_to_sheet(anomRows);
+    ws3['!cols']=[{wch:18},{wch:12},{wch:30},{wch:12},{wch:35},{wch:14},{wch:10},{wch:16},{wch:30}];
+    XLSX.utils.book_append_sheet(wb,ws3,'Anomalias');
+  }
+
+  setProg(95,'Guardando archivo...');
+  await new Promise(function(res){setTimeout(res,100);});
+  var fname='diagnostico_'+(muniName||'campo').replace(/\s/g,'_').toLowerCase()+'_'+tdate()+'.xlsx';
+  XLSX.writeFile(wb,fname);
+  setProg(100,'Listo');
+  actlog.unshift({ts:new Date().toISOString(),msg:'Excel exportado - '+recs.length+' reg, '+fotoIdx+' fotos'});
+  saveData();
+  setTimeout(function(){hideProg();toast('Excel guardado: '+fname);},800);
+}
+
 // ═══ EXPORT ═══
 function renderExp(){
   document.getElementById('ex-tot').textContent=recs.length;
@@ -1379,7 +2006,7 @@ function dl(name,mime,content){
 function tdate(){return new Date().toISOString().slice(0,10);}
 function expCSV(){
   if(!recs.length){toast('Sin registros');return;}
-  var cols=['id','fecha_diag','tecnico','sector','calle','ref','entre','vano',
+  var cols=['municipalidad','id','fecha_diag','tecnico','sector','calle','ref','entre','vano',
     'lat','lon','gps_acc','cables','h_primera','h_ultima','crucetas','estado_poste',
     'anomalias','anomalias_empresas','anomalias_cantidades','empresas','prioridad',
     'peatones','retiro','obs','n_fotos','ts'];
@@ -1390,7 +2017,7 @@ function expCSV(){
       return d.nombre+': '+Object.entries(d.empresa_conteos||{}).map(function(x){return x[0]+'('+x[1]+')';}).join(', ');
     }).join(' | ');
     var qtyStr=dets.map(function(d){return d.nombre+':'+d.cantidad_total;}).join(' | ');
-    var vals=Object.assign({},r,{anomalias:activa.join('; '),anomalias_empresas:empStr,
+    var vals=Object.assign({},r,{municipalidad:muniName,anomalias:activa.join('; '),anomalias_empresas:empStr,
       anomalias_cantidades:qtyStr,empresas:(r.empresas||[]).join('; ')});
     return cols.map(function(c){
       var v=vals[c]===undefined||vals[c]===null?'':vals[c];
@@ -1462,15 +2089,23 @@ function toast(msg){
 loadData();
 initAnomData();
 updateHome();
+loadMuni();
 
 </script>
 
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('./sw.js')
-      .then(function(r){ console.log('SW registrado'); })
-      .catch(function(e){ console.log('SW error:', e); });
+    // Solo registrar SW en produccion (GitHub Pages), no en previsualizadores
+    var host = window.location.hostname;
+    var esProduccion = host !== 'localhost' &&
+                       !host.includes('claudeusercontent.com') &&
+                       !host.includes('127.0.0.1');
+    if(esProduccion){
+      navigator.serviceWorker.register('./sw.js')
+        .then(function(r){ console.log('SW registrado:', r.scope); })
+        .catch(function(e){ console.log('SW no disponible:', e.message); });
+    }
   });
 }
 </script>
